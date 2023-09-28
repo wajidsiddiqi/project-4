@@ -1,6 +1,6 @@
 //*Lottery
 //*Enter the lottery (paying some amount)
-//*Pick a random winner (verifiably random)
+//*Pick random 3 winner (verifiably random)
 //*Winner to be selected after every X mins => completly automate
 //*Chainlink Oracle => randomness, Automated execution (Chainlibk keepers)
 
@@ -21,7 +21,7 @@ error Lottery__UpkeepNotNeeded(
 );
 
 /*
- ? @title A sample Lottery Contract
+ ? @title Lottery
  ? @author Wajid
  ? @notice this contract is for creating an untamperable decentralized smart contract
  ? @dev this implements chainlink VRF v2 and chainlink keepers
@@ -42,18 +42,19 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
-    uint32 private constant NUM_WORDS = 1;
-    uint256 private constant NUM_WINNERS = 3;
+    uint32 private constant NUM_WORDS = 3;
 
     //*Lottery Variables
-    address[] private s_recentWinners;
+    address payable public s_goldWinner;
+    address payable public s_silverWinner;
+    address payable public s_bronzeWinner;
     LotteryState private s_lotteryState;
     uint256 private s_lastTimeStamp;
     uint256 private immutable i_interval;
 
     //*Events
     event LotteryEnter(address indexed player);
-    event RequestedLotteryWinner(uint256 indexed requestId);
+    event RequestedLotteryWinners(uint256 indexed requestId);
     event WinnersPicked(address[] indexed winners);
 
     //*Functions
@@ -91,7 +92,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
      ? they look for the "upkeepNeeded" to return true
      ? The following should be true in order to return true: 
      ? 1. Our time interval should have passed
-     ? 2. The Lottery should have at least one player, and have some ETH 
+     ? 2. The Lottery should have at least three player, and have some ETH 
      ? 3. Our subscription is funded with Link
      ? 4. The Lottery should be in an "open" state 
      */
@@ -105,7 +106,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
         bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
-        bool hasPlayers = (s_players.length > 0);
+        bool hasPlayers = (s_players.length > 3);
         bool hasBalance = address(this).balance > 0;
         upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
     }
@@ -128,46 +129,54 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
             i_callbackGasLimit,
             NUM_WORDS
         );
-        emit RequestedLotteryWinner(requestId);
+        emit RequestedLotteryWinners(requestId);
     }
 
     function fulfillRandomWords(
         uint256 /*requestId,*/,
         uint256[] memory randomWords
     ) internal override {
-        require(
-            s_players.length >= NUM_WINNERS,
-            "Not enough players for winners"
-        );
+        uint256[] memory winningIndexes = new uint256[](3);
 
-        address payable[] memory winners = new address payable[](NUM_WINNERS);
-        bool[] memory usedIndices = new bool[](s_players.length); // Use s_players.length to match the number of players
+        // Generate three unique random numbers for winners
+        for (uint256 i = 0; i < 3; i++) {
+            uint256 randomIndex = randomWords[i] % s_players.length;
 
-        for (uint8 i = 0; i < NUM_WINNERS; i++) {
-            uint256 randomIndex;
-            do {
-                randomIndex = randomWords[i] % s_players.length;
-            } while (usedIndices[randomIndex]);
+            // Ensure the index is unique
+            for (uint256 j = 0; j < i; j++) {
+                require(randomIndex != winningIndexes[j], "Duplicate winner");
+            }
 
-            winners[i] = s_players[randomIndex];
-            usedIndices[randomIndex] = true;
+            winningIndexes[i] = randomIndex;
         }
 
-        s_recentWinners = winners;
+        s_goldWinner = s_players[winningIndexes[0]];
+        s_silverWinner = s_players[winningIndexes[1]];
+        s_bronzeWinner = s_players[winningIndexes[2]];
+
         s_lotteryState = LotteryState.OPEN;
         s_players = new address payable[](0);
         s_lastTimeStamp = block.timestamp;
 
-        for (uint8 i = 0; i < NUM_WINNERS; i++) {
-            (bool success, ) = winners[i].call{
-                value: address(this).balance / NUM_WINNERS
-            }("");
-            if (!success) {
-                revert Lottery__TransferFailed();
-            }
-        }
+        // Transfer rewards to winners
+        distributePrizes();
 
-        emit WinnersPicked(winners);
+        emit WinnerPicked(s_goldWinner);
+        emit WinnerPicked(s_silverWinner);
+        emit WinnerPicked(s_bronzeWinner);
+    }
+
+    function distributePrizes() private {
+        // Calculate prize amounts (you can adjust these as needed)
+        uint256 totalPrize = address(this).balance;
+        uint256 goldPrize = (totalPrize * 50) / 100; // 50%
+        uint256 silverPrize = (totalPrize * 30) / 100; // 30%
+        uint256 bronzePrize = (totalPrize * 20) / 100; // 20%
+
+        // Transfer prizes to winners
+        require(s_goldWinner.send(goldPrize), "Gold transfer failed");
+        require(s_silverWinner.send(silverPrize), "Silver transfer failed");
+        require(s_bronzeWinner.send(bronzePrize), "Bronze transfer failed");
     }
 
     //*View Functions
@@ -177,6 +186,10 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     function getPlayers(uint256 index) public view returns (address) {
         return s_players[index];
+    }
+
+    function getRecentWinner() public view returns (address) {
+        return s_recentWinner;
     }
 
     function getLotteryState() public view returns (LotteryState) {
@@ -202,12 +215,10 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     function getInterval() public view returns (uint256) {
         return i_interval;
     }
-
-    function getRecentWinners() public view returns (address[] memory) {
-        return s_recentWinners;
-    }
-
-    function getNumWinners() public pure returns (uint8) {
-        return NUM_WINNERS;
-    }
 }
+
+/**
+
+https://chat.openai.com/c/5456d115-f03b-4c7f-816f-8004e0242fbb
+
+ */
