@@ -45,9 +45,9 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     uint32 private constant NUM_WORDS = 3;
 
     //*Lottery Variables
-    address payable public s_goldWinner;
-    address payable public s_silverWinner;
-    address payable public s_bronzeWinner;
+    address payable private s_goldWinner;
+    address payable private s_silverWinner;
+    address payable private s_bronzeWinner;
     LotteryState private s_lotteryState;
     uint256 private s_lastTimeStamp;
     uint256 private immutable i_interval;
@@ -55,7 +55,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     //*Events
     event LotteryEnter(address indexed player);
     event RequestedLotteryWinners(uint256 indexed requestId);
-    event WinnersPicked(address[] indexed winners);
+    event WinnerPicked(address[] indexed winner);
 
     //*Functions
     constructor(
@@ -166,7 +166,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         emit WinnerPicked(s_bronzeWinner);
     }
 
-    function distributePrizes() private {
+    function distributePrizes() internal {
         // Calculate prize amounts (you can adjust these as needed)
         uint256 totalPrize = address(this).balance;
         uint256 goldPrize = (totalPrize * 50) / 100; // 50%
@@ -188,8 +188,16 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         return s_players[index];
     }
 
-    function getRecentWinner() public view returns (address) {
-        return s_recentWinner;
+    function getGoldWinner() public view returns (address) {
+        return s_goldWinner;
+    }
+
+    function getSilverWinner() public view returns (address) {
+        return s_silverWinner;
+    }
+
+    function getBronzeWinner() public view returns (address) {
+        return s_bronzeWinner;
     }
 
     function getLotteryState() public view returns (LotteryState) {
