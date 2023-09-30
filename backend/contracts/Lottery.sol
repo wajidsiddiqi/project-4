@@ -19,6 +19,7 @@ error Lottery__UpkeepNotNeeded(
     uint256 numPlayers,
     uint256 lotteryState
 );
+error Lottery__DuplicateWinner();
 
 /*
  ? @title Lottery
@@ -55,7 +56,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     //*Events
     event LotteryEnter(address indexed player);
     event RequestedLotteryWinners(uint256 indexed requestId);
-    event WinnerPicked(address[] indexed winner);
+    event WinnerPicked(address payable indexed winners);
 
     //*Functions
     constructor(
@@ -106,7 +107,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
         bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
-        bool hasPlayers = (s_players.length > 3);
+        bool hasPlayers = (s_players.length >= 3);
         bool hasBalance = address(this).balance > 0;
         upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
     }
@@ -142,12 +143,15 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         for (uint256 i = 0; i < 3; i++) {
             uint256 randomIndex = randomWords[i] % s_players.length;
 
-            // Ensure the index is unique
-            for (uint256 j = 0; j < i; j++) {
-                require(randomIndex != winningIndexes[j], "Duplicate winner");
-            }
-
+            // Store the unique random index
             winningIndexes[i] = randomIndex;
+
+            // Ensure the index is unique
+            for (uint256 j = 0; j < winningIndexes.length; j++) {
+                if (randomIndex == winningIndexes[j]) {
+                    revert Lottery__DuplicateWinner();
+                }
+            }
         }
 
         s_goldWinner = s_players[winningIndexes[0]];
@@ -159,15 +163,15 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         s_lastTimeStamp = block.timestamp;
 
         // Transfer rewards to winners
-        distributePrizes();
+        distributeLottery();
 
         emit WinnerPicked(s_goldWinner);
         emit WinnerPicked(s_silverWinner);
         emit WinnerPicked(s_bronzeWinner);
     }
 
-    function distributePrizes() internal {
-        // Calculate prize amounts (you can adjust these as needed)
+    function distributeLottery() internal {
+        // Calculate prize amounts
         uint256 totalPrize = address(this).balance;
         uint256 goldPrize = (totalPrize * 50) / 100; // 50%
         uint256 silverPrize = (totalPrize * 30) / 100; // 30%
@@ -204,7 +208,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         return s_lotteryState;
     }
 
-    function getNumWords() public pure returns (uint56) {
+    function getNumWords() public pure returns (uint32) {
         return NUM_WORDS;
     }
 
@@ -224,9 +228,3 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         return i_interval;
     }
 }
-
-/**
-
-https://chat.openai.com/c/5456d115-f03b-4c7f-816f-8004e0242fbb
-
- */
