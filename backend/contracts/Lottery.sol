@@ -23,8 +23,7 @@ error Lottery__DuplicateWinner();
 
 /*
  ? @title Lottery
- ? @author Wajid
- ? @notice this contract is for creating an untamperable decentralized smart contract
+ ? @author Wajid [ https://twitter.com/abdulwajidsid ]
  ? @dev this implements chainlink VRF v2 and chainlink keepers
  */
 
