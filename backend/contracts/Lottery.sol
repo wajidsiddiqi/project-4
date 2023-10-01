@@ -165,16 +165,16 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     }
 
     function distributeLottery() internal {
-        // Calculate prize amounts
-        uint256 totalPrize = address(this).balance;
-        uint256 goldPrize = (totalPrize * 50) / 100; // 50%
-        uint256 silverPrize = (totalPrize * 30) / 100; // 30%
-        uint256 bronzePrize = (totalPrize * 20) / 100; // 20%
+        // Calculate lottery amount
+        uint256 totalAmount = address(this).balance;
+        uint256 goldAmount = (totalAmount * 50) / 100; // 50%
+        uint256 silverAmount = (totalAmount * 30) / 100; // 30%
+        uint256 bronzeAmount = (totalAmount * 20) / 100; // 20%
 
         // Transfer prizes to winners
-        require(s_goldWinner.send(goldPrize), "Gold transfer failed");
-        require(s_silverWinner.send(silverPrize), "Silver transfer failed");
-        require(s_bronzeWinner.send(bronzePrize), "Bronze transfer failed");
+        payable(s_goldWinner).transfer(goldAmount);
+        payable(s_silverWinner).transfer(silverAmount);
+        payable(s_bronzeWinner).transfer(bronzeAmount);
     }
 
     //*View Functions
