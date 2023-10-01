@@ -138,25 +138,19 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         uint256[] memory randomWords
     ) internal override {
         uint256[] memory winningIndexes = new uint256[](3);
+        address payable[] memory players = s_players; // saving s_players array in memory cos of gas efficiency
 
         // Generate three unique random numbers for winners
         for (uint256 i = 0; i < 3; i++) {
-            uint256 randomIndex = randomWords[i] % s_players.length;
+            uint256 randomIndex = randomWords[i] % players.length;
 
             // Store the unique random index
             winningIndexes[i] = randomIndex;
-
-            // Ensure the index is unique
-            for (uint256 j = 0; j < winningIndexes.length; j++) {
-                if (randomIndex == winningIndexes[j]) {
-                    revert Lottery__DuplicateWinner();
-                }
-            }
         }
 
-        s_goldWinner = s_players[winningIndexes[0]];
-        s_silverWinner = s_players[winningIndexes[1]];
-        s_bronzeWinner = s_players[winningIndexes[2]];
+        s_goldWinner = players[winningIndexes[0]];
+        s_silverWinner = players[winningIndexes[1]];
+        s_bronzeWinner = players[winningIndexes[2]];
 
         s_lotteryState = LotteryState.OPEN;
         s_players = new address payable[](0);
