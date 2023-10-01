@@ -55,7 +55,9 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
     //*Events
     event LotteryEnter(address indexed player);
     event RequestedLotteryWinners(uint256 indexed requestId);
-    event WinnerPicked(address payable indexed winners);
+    event GoldWinnerPicked(address payable indexed winner);
+    event SilverWinnerPicked(address payable indexed winner);
+    event BronzeWinnerPicked(address payable indexed winner);
 
     //*Functions
     constructor(
@@ -158,9 +160,9 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
         // Transfer rewards to winners
         distributeLottery();
 
-        emit WinnerPicked(s_goldWinner);
-        emit WinnerPicked(s_silverWinner);
-        emit WinnerPicked(s_bronzeWinner);
+        emit GoldWinnerPicked(s_goldWinner);
+        emit SilverWinnerPicked(s_silverWinner);
+        emit BronzeWinnerPicked(s_bronzeWinner);
     }
 
     function distributeLottery() internal {
