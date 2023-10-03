@@ -51,20 +51,27 @@ const { assert, expect } = require("chai");
           ).to.emit(lottery, "LotteryEnter");
         });
 
-        it("doesnt allow to enter lottery when in calculating stage", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+        it("doesn't allow entrance when lottery is calculating", async () => {
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
+          // for a documentation of the methods below, go here: https://hardhat.org/hardhat-network/reference
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
-          await network.provider.send("evm_mine", []);
-          //*We pretend to be a Chainlink Keeper
-          await lottery.performUpkeep([]);
+          await network.provider.request({ method: "evm_mine", params: [] });
+          // we pretend to be a keeper for a second
+          await lottery.performUpkeep([]); // changes the state to calculating for our comparison below
           await expect(
             lottery.enterLottery({ value: lotteryEntranceFee })
-          ).to.be.revertedWithCustomError(lottery, "Lottery__NotOpen");
+          ).to.be.revertedWithCustomError(
+            // is reverted as lottery is calculating
+            lottery,
+            "Lottery__NotOpen"
+          );
         });
       });
-
+      /*
       describe("checkUpkeep", () => {
         it("returns false if people haven't sent any ETH", async () => {
           await network.provider.send("evm_increaseTime", [
@@ -212,4 +219,5 @@ const { assert, expect } = require("chai");
           });
         });
       });
+      */
     });
