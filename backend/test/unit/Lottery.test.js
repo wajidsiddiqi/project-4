@@ -170,17 +170,16 @@ const { assert, expect } = require("chai");
           assert(lotteryState.toString() == "1");
         });
       });
-      /*
+
       describe("fulfillRandomWords", () => {
-        beforeEach(async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+        it("can only be called after performUpkeep", async () => {
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
           await network.provider.send("evm_mine", []);
-        });
-
-        it("can only be called after performUpkeep", async () => {
           await expect(
             vrfCoordinator.fulfillRandomWords(0, lottery.address)
           ).to.be.revertedWith("nonexistent request");
@@ -189,57 +188,37 @@ const { assert, expect } = require("chai");
           ).to.be.revertedWith("nonexistent request");
         });
 
-        it("picks a winner, resets, and sends money", async () => {
-          const aditionalEntrance = 3;
-          const startingAccountIndex = 1;
+        it("picks three winners, resets, and sends money", async () => {
+          const beginning = await lottery.getLatestTimeStamp();
+          // Enter some players into the lottery.
           const accounts = await ethers.getSigners();
-          for (
-            let i = startingAccountIndex;
-            i < startingAccountIndex + aditionalEntrance;
-            i++
-          ) {
-            const accountCoonectedLottery = lottery.connect(accounts[i]);
-            await accountCoonectedLottery.enterLottery({
-              value: lotteryEntranceFee,
-            });
+          for (let i = 0; i < 3; i++) {
+            await lottery
+              .connect(accounts[i])
+              .enterLottery({ value: lotteryEntranceFee });
           }
-          const startingTimeStamp = await lottery.getLastTimeStamp();
-          await new Promise(async (resolve, reject) => {
-            lottery.once("WinnerPicked", async () => {
-              console.log("found the event!");
-              try {
-                const recentWinner = await lottery.getRecentWinner();
-                const lotteryState = await lottery.getLotteryState();
-                const endingTimeStamp = await lottery.getLastTimeStamp();
-                const numPlayers = await lottery.getNumberOfPlayers();
-                const winnerEndingBalance = await accounts[1].getBalance();
-                assert.equal(recentWinner.toString(), accounts[1].address);
-                assert.equal(numPlayers, 0);
-                assert.equal(lotteryState, 0);
-                assert(endingTimeStamp > startingTimeStamp);
-                assert.equal(
-                  winnerEndingBalance.toString(),
-                  winnerStartingBalance.add(
-                    lotteryEntranceFee
-                      .mul(aditionalEntrance)
-                      .add(lotteryEntranceFee)
-                      .toString()
-                  )
-                );
-                resolve();
-              } catch (e) {
-                reject(e);
-              }
-            });
-            const tx = await lottery.performUpkeep([]);
-            const txReceipt = await tx.wait(1);
-            const winnerStartingBalance = await accounts[1].getBalance();
-            await vrfCoordinator.fulfillRandomWords(
-              txReceipt.events[1].args.requestId,
-              lottery.address
-            );
-          });
+          await network.provider.send("evm_increaseTime", [
+            interval.toNumber() + 1,
+          ]);
+          await network.provider.send("evm_mine", []);
+          const tx = await lottery.performUpkeep([]);
+          const txReceipt = await tx.wait(1);
+          await vrfCoordinator.fulfillRandomWords(
+            txReceipt.events[1].args.requestId,
+            lottery.address
+          );
+
+          // Check that the lottery state and players array was reset & check time.
+          const lotteryState = await lottery.getLotteryState();
+          const numberOfPlayers = await lottery.getNumberOfPlayers();
+          const ending = await lottery.getLatestTimeStamp();
+          assert(lotteryState.toString() == "0");
+          assert(numberOfPlayers.toString() == "0");
+          assert(ending > beginning);
+
+          // Check that the winners were paid.
+          const balance = await ethers.provider.getBalance(lottery.address);
+          assert(balance.toString() == "0");
         });
       });
-      */
     });
