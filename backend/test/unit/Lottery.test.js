@@ -133,10 +133,12 @@ const { assert, expect } = require("chai");
           assert(upkeepNeeded);
         });
       });
-      /*
+
       describe("performUpkeep", () => {
         it("can only run if checkUpkeep is true", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
@@ -153,7 +155,9 @@ const { assert, expect } = require("chai");
         });
 
         it("updates the lottery state, emits an event and calls the vrfCoordinator", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
@@ -166,7 +170,7 @@ const { assert, expect } = require("chai");
           assert(lotteryState.toString() == "1");
         });
       });
-
+      /*
       describe("fulfillRandomWords", () => {
         beforeEach(async () => {
           await lottery.enterLottery({ value: lotteryEntranceFee });
