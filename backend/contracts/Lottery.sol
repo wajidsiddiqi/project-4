@@ -54,7 +54,6 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     //*Events
     event LotteryEnter(address indexed player);
-    event RequestedLotteryWinners(uint256 indexed requestId);
     event GoldWinnerPicked(address payable indexed winner);
     event SilverWinnerPicked(address payable indexed winner);
     event BronzeWinnerPicked(address payable indexed winner);
@@ -131,7 +130,6 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
             i_callbackGasLimit,
             NUM_WORDS
         );
-        emit RequestedLotteryWinners(requestId);
     }
 
     function fulfillRandomWords(
