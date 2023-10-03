@@ -71,7 +71,7 @@ const { assert, expect } = require("chai");
           );
         });
       });
-      /*
+
       describe("checkUpkeep", () => {
         it("returns false if people haven't sent any ETH", async () => {
           await network.provider.send("evm_increaseTime", [
@@ -82,8 +82,22 @@ const { assert, expect } = require("chai");
           assert(!upkeepNeeded);
         });
 
+        it("returns false if enough people haven't entered", async () => {
+          for (let i = 0; i < 2; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
+          await network.provider.send("evm_increaseTime", [
+            interval.toNumber() + 1,
+          ]);
+          await network.provider.send("evm_mine", []);
+          const { upkeepNeeded } = await lottery.callStatic.checkUpkeep([]);
+          assert(!upkeepNeeded);
+        });
+
         it("returns false if lottery is not in open state", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
@@ -96,7 +110,9 @@ const { assert, expect } = require("chai");
         });
 
         it("returns false if enough time hasn't passed", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() - 5,
           ]);
@@ -106,7 +122,9 @@ const { assert, expect } = require("chai");
         });
 
         it("returns true if enough time has passed, have players, eth, and is open", async () => {
-          await lottery.enterLottery({ value: lotteryEntranceFee });
+          for (let i = 0; i < 3; i++) {
+            await lottery.enterLottery({ value: lotteryEntranceFee });
+          }
           await network.provider.send("evm_increaseTime", [
             interval.toNumber() + 1,
           ]);
@@ -115,7 +133,7 @@ const { assert, expect } = require("chai");
           assert(upkeepNeeded);
         });
       });
-
+      /*
       describe("performUpkeep", () => {
         it("can only run if checkUpkeep is true", async () => {
           await lottery.enterLottery({ value: lotteryEntranceFee });
