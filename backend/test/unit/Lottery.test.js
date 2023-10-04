@@ -188,8 +188,13 @@ const { assert, expect } = require("chai");
           ).to.be.revertedWith("nonexistent request");
         });
 
-        it("picks three winners, resets, and sends money", async () => {
+        it("picks three winners, fire events, resets, and sends money", async () => {
           const beginning = await lottery.getLatestTimeStamp();
+          // Declare variables to store winner data
+          let goldWinnerData;
+          let silverWinnerData;
+          let bronzeWinnerData;
+
           // Enter some players into the lottery.
           const accounts = await ethers.getSigners();
           for (let i = 0; i < 3; i++) {
@@ -208,13 +213,65 @@ const { assert, expect } = require("chai");
             lottery.address
           );
 
-          // Check that the lottery state and players array was reset & check time.
+          // Define the event names you want to listen for
+          const goldEventName = "GoldWinnerPicked";
+          const silverEventName = "SilverWinnerPicked";
+          const bronzeEventName = "BronzeWinnerPicked";
+
+          // Define async functions to listen for events
+          async function listenForGoldEvent() {
+            await new Promise((resolve) => {
+              lottery.on(goldEventName, (data) => {
+                // Store the gold winner data
+                goldWinnerData = data;
+                console.log("GoldWinnerPicked event:", goldWinnerData);
+                resolve();
+              });
+            });
+          }
+
+          async function listenForSilverEvent() {
+            await new Promise((resolve) => {
+              lottery.on(silverEventName, (data) => {
+                // Store the silver winner data
+                silverWinnerData = data;
+                console.log("SilverWinnerPicked event:", silverWinnerData);
+                resolve();
+              });
+            });
+          }
+
+          async function listenForBronzeEvent() {
+            await new Promise((resolve) => {
+              lottery.on(bronzeEventName, (data) => {
+                // Store the bronze winner data
+                bronzeWinnerData = data;
+                console.log("BronzeWinnerPicked event:", bronzeWinnerData);
+                resolve();
+              });
+            });
+          }
+
+          // Use Promise.all to start listening for all events concurrently
+          await Promise.all([
+            listenForGoldEvent(),
+            listenForSilverEvent(),
+            listenForBronzeEvent(),
+          ]);
+
+          // Now that all event listeners have completed, you can perform your checks.
+          // Check that the lottery state and players array were reset & check time.
           const lotteryState = await lottery.getLotteryState();
           const numberOfPlayers = await lottery.getNumberOfPlayers();
           const ending = await lottery.getLatestTimeStamp();
           assert(lotteryState.toString() == "0");
           assert(numberOfPlayers.toString() == "0");
           assert(ending > beginning);
+
+          // Check winners are picked
+          assert.equal(await lottery.getGoldWinner(), goldWinnerData);
+          assert.equal(await lottery.getSilverWinner(), silverWinnerData);
+          assert.equal(await lottery.getBronzeWinner(), bronzeWinnerData);
 
           // Check that the winners were paid.
           const balance = await ethers.provider.getBalance(lottery.address);
