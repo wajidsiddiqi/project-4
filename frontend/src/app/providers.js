@@ -22,7 +22,9 @@ export function Providers({ children }) {
   return (
     <WagmiConfig config={config}>
       <ConnectKitProvider theme="rounded">
-        <NextUIProvider>{mounted && children}</NextUIProvider>
+        <NextUIProvider>
+          <main className="light">{mounted && children}</main>
+        </NextUIProvider>
       </ConnectKitProvider>
     </WagmiConfig>
   );
