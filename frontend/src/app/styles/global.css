@@ -1,24 +1,10 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  background-color: #b6dceb;
-}
-
-img {
-  display: block;
-}
-
-a {
-  text-decoration: none;
-}
-
-body::-webkit-scrollbar {
+/* body::-webkit-scrollbar {
   width: 12px;
-}
+} */
 
 /* body::-webkit-scrollbar-track {
   background: #18120b;
