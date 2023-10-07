@@ -3,8 +3,8 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { createConfig, WagmiConfig } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import React, { useState, useEffect } from "react";
-
-import { NextUIProvider } from "@nextui-org/react";
+import { CacheProvider } from "@chakra-ui/next-js";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const config = createConfig(
   getDefaultConfig({
@@ -22,9 +22,9 @@ export function Providers({ children }) {
   return (
     <WagmiConfig config={config}>
       <ConnectKitProvider theme="rounded">
-        <NextUIProvider>
-          <main className="light">{mounted && children}</main>
-        </NextUIProvider>
+        <CacheProvider>
+          <ChakraProvider>{mounted && children}</ChakraProvider>
+        </CacheProvider>
       </ConnectKitProvider>
     </WagmiConfig>
   );
