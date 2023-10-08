@@ -1,16 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* body::-webkit-scrollbar {
-  width: 12px;
-} */
-
-/* body::-webkit-scrollbar-track {
-  background: #18120b;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-body::-webkit-scrollbar-thumb {
-  border-radius: 20px;
-  background: #ffaa00;
-} */
+body {
+  background-color: #d7fff8;
+}
+
+img {
+  display: block;
+}
+
+a {
+  text-decoration: none;
+}
