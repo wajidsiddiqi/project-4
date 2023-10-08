@@ -1,34 +1,42 @@
 "use client";
-import Image from "next/image";
-import { LogoText } from "@/app/styles/styles";
+import React from "react";
+import Header from "./components/Header";
 import {
-  Navbar,
-  NavbarContent,
-  NavbarItem,
-  Button,
-  NavbarBrand,
-} from "@nextui-org/react";
-import { ConnectKitButton } from "connectkit";
+  Center,
+  PageWrapper,
+  Box,
+  ChildContainer,
+  Icon,
+  ParaMid,
+  StyledButton,
+} from "./styles/styles";
 
 export default function Home() {
   return (
-    <Navbar position="static">
-      <NavbarBrand>
-        <LogoText>Decentralized Lottery</LogoText>
-      </NavbarBrand>
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <ConnectKitButton.Custom>
-            {({ show, isConnected }) => {
-              return (
-                <Button onClick={show} color="primary" variant="flat">
-                  {isConnected ? "Disconnect" : "Connect"}
-                </Button>
-              );
-            }}
-          </ConnectKitButton.Custom>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+    <React.Fragment>
+      <Header />
+      <PageWrapper>
+        <Center>
+          <Box>
+            <ChildContainer>
+              <Icon>Gold</Icon>
+              <ParaMid>Gold Winner:</ParaMid>
+              <ParaMid>0x00000000</ParaMid>
+            </ChildContainer>
+            <ChildContainer>
+              <Icon>Silver</Icon>
+              <ParaMid>Silver Winner:</ParaMid>
+              <ParaMid>0x00000000</ParaMid>
+            </ChildContainer>
+            <ChildContainer>
+              <Icon>Bronze</Icon>
+              <ParaMid>Bronze Winner:</ParaMid>
+              <ParaMid>0x00000000</ParaMid>
+            </ChildContainer>
+            <StyledButton>Enter Lotter</StyledButton>
+          </Box>
+        </Center>
+      </PageWrapper>
+    </React.Fragment>
   );
 }
