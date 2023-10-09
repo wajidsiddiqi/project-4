@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import Header from "./components/Header";
 import {
   Center,
@@ -9,6 +10,7 @@ import {
   Icon,
   ParaMid,
   StyledButton,
+  ParaSm,
 } from "./styles/styles";
 
 export default function Home() {
@@ -19,21 +21,62 @@ export default function Home() {
         <Center>
           <Box>
             <ChildContainer>
-              <Icon>Gold</Icon>
-              <ParaMid>Gold Winner:</ParaMid>
-              <ParaMid>0x00000000</ParaMid>
+              <Icon>
+                <Image
+                  src="/assets/icons/gold.svg"
+                  width="40"
+                  height="40"
+                  alt="Gold"
+                />
+              </Icon>
+              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+                <Center>
+                  <ParaMid>Gold Winner:</ParaMid>
+                </Center>
+                <Center>
+                  <ParaSm>0x00000000</ParaSm>
+                </Center>
+              </Center>
             </ChildContainer>
             <ChildContainer>
-              <Icon>Silver</Icon>
-              <ParaMid>Silver Winner:</ParaMid>
-              <ParaMid>0x00000000</ParaMid>
+              <Icon>
+                <Image
+                  src="/assets/icons/silver.svg"
+                  width="40"
+                  height="40"
+                  alt="Silver"
+                />
+              </Icon>
+              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+                <Center>
+                  <ParaMid>Silver Winner:</ParaMid>
+                </Center>
+                <Center>
+                  <ParaSm>0x00000000</ParaSm>
+                </Center>
+              </Center>
             </ChildContainer>
             <ChildContainer>
-              <Icon>Bronze</Icon>
-              <ParaMid>Bronze Winner:</ParaMid>
-              <ParaMid>0x00000000</ParaMid>
+              <Icon>
+                <Image
+                  src="/assets/icons/bronze.svg"
+                  width="40"
+                  height="40"
+                  alt="Bronze"
+                />
+              </Icon>
+              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+                <Center>
+                  <ParaMid>Bronze Winner:</ParaMid>
+                </Center>
+                <Center>
+                  <ParaSm>0x00000000</ParaSm>
+                </Center>
+              </Center>
             </ChildContainer>
-            <StyledButton>Enter Lotter</StyledButton>
+            <StyledButton style={{ marginTop: "7px" }}>
+              Enter Lotter
+            </StyledButton>
           </Box>
         </Center>
       </PageWrapper>
