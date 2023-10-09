@@ -18,7 +18,7 @@ export default function Home() {
     <React.Fragment>
       <Header />
       <PageWrapper>
-        <Center>
+        <Center style={{ height: "100vh" }}>
           <Box>
             <ChildContainer>
               <Icon>
@@ -29,7 +29,7 @@ export default function Home() {
                   alt="Gold"
                 />
               </Icon>
-              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+              <Center style={{ alignItems: "baseline", gap: "0.4rem" }}>
                 <Center>
                   <ParaMid>Gold Winner:</ParaMid>
                 </Center>
@@ -47,7 +47,7 @@ export default function Home() {
                   alt="Silver"
                 />
               </Icon>
-              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+              <Center style={{ alignItems: "baseline", gap: "0.4rem" }}>
                 <Center>
                   <ParaMid>Silver Winner:</ParaMid>
                 </Center>
@@ -65,7 +65,7 @@ export default function Home() {
                   alt="Bronze"
                 />
               </Icon>
-              <Center style={{ alignItems: "baseline", gap: "0.2rem" }}>
+              <Center style={{ alignItems: "baseline", gap: "0.4rem" }}>
                 <Center>
                   <ParaMid>Bronze Winner:</ParaMid>
                 </Center>
@@ -74,7 +74,7 @@ export default function Home() {
                 </Center>
               </Center>
             </ChildContainer>
-            <StyledButton style={{ marginTop: "7px" }}>
+            <StyledButton color="opp" style={{ marginTop: "10px" }}>
               Enter Lotter
             </StyledButton>
           </Box>
