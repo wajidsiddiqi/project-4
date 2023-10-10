@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { ethers } from "ethers";
 import {
   usePrepareContractWrite,
@@ -11,6 +12,7 @@ import {
   StyledButton,
   StyledConnectButton,
   Modal,
+  Modal2,
   ErrorMsg,
   ErrorContainer,
   CloseIcon,
@@ -85,7 +87,7 @@ export default function EnterLottery() {
         >
           {isLoading ? (
             <Image
-              src="/assets/icons/dot_lottery.svg"
+              src="/assets/icons/dot_loader.svg"
               width="36"
               height="36"
               alt="loading"
@@ -110,10 +112,10 @@ export default function EnterLottery() {
         </ConnectKitButton.Custom>
       )}
 
-      {(isPrepareError || isError) && isErrorSeen && (
-        <Modal>
-          <ErrorContainer>
-            <ErrorMsg $isErrorSeen={isErrorSeen}>
+      {(isPrepareError || isError) && (
+        <Modal $isErrorSeen={isErrorSeen}>
+          <ErrorContainer $isErrorSeen={isErrorSeen}>
+            <ErrorMsg>
               <CloseIcon onClick={() => setIsErrorSeen(false)}>X</CloseIcon>
               {handleError(prepareError || error)}
             </ErrorMsg>
@@ -121,14 +123,14 @@ export default function EnterLottery() {
         </Modal>
       )}
 
-      {isSuccess && isSucSeen && (
-        <Modal>
-          <SuccessContainer>
-            <SuccessMsg $isSucSeen={isSucSeen}>
+      {isSuccess && (
+        <Modal2 $isSucSeen={isSucSeen}>
+          <SuccessContainer $isSucSeen={isSucSeen}>
+            <SuccessMsg>
               <CloseIcon onClick={() => setIsSucSeen(false)}>X</CloseIcon>
               You have successfully entered the lottery!
               <br />
-              View on{" "}
+              View transition on{" "}
               <a
                 href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
                 target="_blank"
@@ -141,7 +143,7 @@ export default function EnterLottery() {
               </a>
             </SuccessMsg>
           </SuccessContainer>
-        </Modal>
+        </Modal2>
       )}
     </React.Fragment>
   );
