@@ -70,7 +70,7 @@ export default function EnterLottery() {
         }
         return output;
       }
-    } else {
+    } else if (error) {
       console.error(error);
       return "An error occurred while executing the contract function.";
     }
