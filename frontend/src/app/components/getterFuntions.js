@@ -1,25 +1,5 @@
 import { readContracts } from "wagmi";
-import { ethers } from "ethers";
 import Contract from "../Lottery.json";
-
-const EntranceFee = async () => {
-  const getEntranceFee = await readContracts({
-    contracts: [
-      {
-        address: Contract.address,
-        abi: Contract.abi,
-        functionName: "getEntranceFee",
-      },
-    ],
-  });
-
-  if (getEntranceFee[0].status === "success") {
-    return ethers.formatEther(getEntranceFee[0].result).toString();
-  } else {
-    const error = getTotalSupply[0].error;
-    console.error("Error:", error);
-  }
-};
 
 const GoldWinner = async () => {
   const getGoldWinner = await readContracts({
@@ -78,4 +58,4 @@ const BronzeWinner = async () => {
   }
 };
 
-export { EntranceFee, GoldWinner, SilverWinner, BronzeWinner };
+export { GoldWinner, SilverWinner, BronzeWinner };
