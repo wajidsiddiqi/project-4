@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Header from "./components/Header";
 import EnterLottery from "./components/EnterLottery";
+import Footer from "./components/Footer";
 import {
   BronzeWinner,
   GoldWinner,
@@ -52,7 +53,7 @@ export default function Home() {
       .catch((error) => {
         console.error("Error fetching total supply:", error);
       });
-  }, []); // Empty dependency array to run once on mount*/
+  }, []); // Empty dependency array to run once on mount
 
   return (
     <React.Fragment>
@@ -60,6 +61,9 @@ export default function Home() {
       <PageWrapper>
         <Center style={{ height: "100vh" }}>
           <Box>
+            <ParaMid style={{ marginBottom: "10px", fontSize: "1.4rem" }}>
+              Recent Winners
+            </ParaMid>
             <ChildContainer>
               <Icon>
                 <Image
@@ -118,6 +122,7 @@ export default function Home() {
           </Box>
         </Center>
       </PageWrapper>
+      <Footer />
     </React.Fragment>
   );
 }
