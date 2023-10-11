@@ -59,7 +59,11 @@ export default function EnterLottery() {
       const errorMsg = error?.message;
       if (errorMsg.includes("InsufficientFundsError")) {
         return "Insufficient funds to perform this operation.";
-      } else {
+      }
+      if (errorMsg.includes("User rejected the request")) {
+        return "MetaMask Tx Signature: User denied transaction signature";
+      }
+      if (errorMsg.includes("Contract Call")) {
         const errorLines = errorMsg.split("\n");
         let output = "";
         for (let i = 0; i < errorLines.length; i++) {
@@ -69,10 +73,10 @@ export default function EnterLottery() {
           output += errorLines[i] + "\n";
         }
         return output;
+      } else {
+        console.error(error);
+        return "An error occurred while executing the contract function.";
       }
-    } else if (error) {
-      console.error(error);
-      return "An error occurred while executing the contract function.";
     }
   }
 
